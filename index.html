@@ -33,7 +33,8 @@ nav button{flex:1;border:0;background:none;color:var(--mut);font-size:11px;paddi
 .dial{width:240px;height:240px;border-radius:50%;border:3px solid var(--line);margin:14px auto;position:relative}
 .dial i{position:absolute;inset:0;transition:transform .25s}.dial i:before{content:"";position:absolute;left:50%;top:6px;margin-left:-15px;border:15px solid transparent;border-bottom:95px solid var(--g);border-top:0}
 .dial b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:34px}
-</style></head><body>
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+</head><body>
 <div class="top"><h1>Noor-e-Ilahi نورِ الٰہی</h1><div class="sm" id="hj"></div></div>
 <main id="v"></main>
 <div id="bar"><span id="pn">Playing…</span><span><button id="pp">Pause</button><button id="st">Stop</button></span></div>
@@ -171,7 +172,49 @@ mb.insertAdjacentHTML("beforeend",`<div class="card"><h2 style="font-size:17px">
 $("#pm").onchange=ev=>{PM.m=+ev.target.value;sv("pm",PM)};$("#ps").onchange=ev=>{PM.s=+ev.target.value;sv("pm",PM)};document.querySelectorAll("[data-tn]").forEach(i=>i.onchange=()=>{PM.t[+i.dataset.tn]=+i.value||0;sv("pm",PM)});
 document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{CL=b.dataset.l;sv("cl2",CL);more()});document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{TH=b.dataset.t;sv("th",TH);document.documentElement.dataset.theme=TH;more()});$("#rc").onchange=ev=>{RC=ev.target.value;sv("rc",RC)}}}
 
-const V={home,quran,hadith,dua,tasbeeh,more},NAV=[["home","🏠","Home"],["quran","📖","Quran"],["hadith","📜","Hadith"],["dua","🤲","Dua"],["tasbeeh","📿","Tasbeeh"],["more","☰","More"]];
-function go(){$("#nav").innerHTML=NAV.map(n=>`<button class="${n[0]==tab?"on":""}" data-n="${n[0]}"><span>${n[1]}</span>${n[2]}</button>`).join("");document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{tab=b.dataset.n;go()});$("#hj").textContent=hEN(new Date());V[tab]()}
+
+/* ===== Ummah: login, posts, chat (Supabase) ===== */
+const SB=window.supabase?window.supabase.createClient("https://fwwgtfulnbsppbaaqkyu.supabase.co","sb_publishable_GM3nahH8YaEn-F3Jqb9pzw_0V5Mg7p6"):null;
+let me=null,ut=ld("ut","feed"),room=ld("room","general"),am="in",onlyF=false,cleanup=null,pollT=null;
+const ROOMS=[["general","General"],["quran","Quran"],["dua","Dua & Dhikr"],["urdu","اردو"],["arabic","العربية"]];
+const tmf=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+function stop(){if(pollT){clearInterval(pollT);pollT=null}if(cleanup){cleanup();cleanup=null}}
+const rep=async(kind,id)=>{const why=prompt("Why are you reporting this?");if(!why)return;const{error}=await SB.from("reports").insert({reporter_id:me.id,kind,target_id:id,reason:why.slice(0,300)});alert(error?"Could not send report":"Thanks. Report sent.")};
+const blk=async uid=>{if(!confirm("Block this user? You will not see their posts or messages."))return;await SB.from("blocks").insert({blocker_id:me.id,blocked_id:uid})};
+async function ummah(){stop();if(!SB){setV('<div class="card">Community could not load. Check your internet.</div>');return}
+const{data}=await SB.auth.getSession();me=data.session?data.session.user:null;if(!me)return authView();
+setV(`<div class="tabs">${[["feed","Posts"],["chat","Chat"],["acct","Account"]].map(t=>`<button class="pill ${ut==t[0]?"on":""}" data-u="${t[0]}">${t[1]}</button>`).join("")}</div><div id="ub"></div>`);
+document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{ut=b.dataset.u;sv("ut",ut);ummah()});
+if(ut=="feed")feed();else if(ut=="chat")chat();else acct()}
+function authView(){setV(`<div class="card"><h2>${am=="in"?"Log in":"Create account"}</h2><br>${am=="up"?'<input id="un" placeholder="Username (3-20 letters, numbers or _)">':""}<input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password (6+ characters)"><button class="btn" id="go">${am=="in"?"Log in":"Sign up"}</button> <button class="pill" id="sw">${am=="in"?"New here? Sign up":"Have an account? Log in"}</button><div id="amsg" class="sm" style="margin-top:8px"></div><div class="sm">Be respectful. Every post and message has Report and Block.</div></div>`);
+$("#sw").onclick=()=>{am=am=="in"?"up":"in";authView()};
+$("#go").onclick=async()=>{const em=$("#em").value.trim(),pw=$("#pw").value;$("#amsg").textContent="Please wait…";let x;if(am=="up"){const un=$("#un").value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(un)){$("#amsg").textContent="Username: 3-20 letters, numbers or _";return}x=await SB.auth.signUp({email:em,password:pw,options:{data:{username:un}}})}else x=await SB.auth.signInWithPassword({email:em,password:pw});
+if(x.error){$("#amsg").textContent=x.error.message;return}if(am=="up"&&!x.data.session){$("#amsg").textContent="Check your email to confirm, then log in.";return}ummah()}}
+async function feed(){const ub=$("#ub");ub.innerHTML='<div class="card sm">Loading…</div>';
+const[bl,fo,ps,lk]=await Promise.all([SB.from("blocks").select("blocked_id"),SB.from("follows").select("following_id"),SB.from("posts").select("*").order("created_at",{ascending:false}).limit(50),SB.from("likes").select("post_id,user_id")]);
+if(ps.error){ub.innerHTML='<div class="card">Could not load posts: '+e(ps.error.message)+'</div>';return}
+const B=new Set((bl.data||[]).map(x=>x.blocked_id)),F=new Set((fo.data||[]).map(x=>x.following_id)),LK={},ML=new Set();(lk.data||[]).forEach(l=>{LK[l.post_id]=(LK[l.post_id]||0)+1;if(l.user_id==me.id)ML.add(l.post_id)});
+const L=ps.data.filter(p=>!B.has(p.user_id)&&(!onlyF||F.has(p.user_id)||p.user_id==me.id));
+ub.innerHTML=`<div class="card"><textarea id="pt" rows="3" maxlength="1000" placeholder="Share a reminder, dua or thought…" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--card);color:var(--ink);font:inherit"></textarea><button class="btn" id="pp2" style="margin-top:8px">Post</button> <button class="pill ${onlyF?"on":""}" id="fof">Following only</button></div>`+(L.map(p=>`<div class="card"><b>${e(p.username)}</b> <span class="sm">${tmf(p.created_at)}</span><div style="white-space:pre-wrap;margin:6px 0">${e(p.body)}</div><div class="tabs"><button class="pill" data-a="like" data-id="${p.id}">${ML.has(p.id)?"♥":"♡"} ${LK[p.id]||0}</button>${p.user_id!=me.id?`<button class="pill" data-a="follow" data-u2="${p.user_id}" data-f="${F.has(p.user_id)?1:0}">${F.has(p.user_id)?"Unfollow":"Follow"}</button><button class="pill" data-a="rep" data-id="${p.id}">Report</button><button class="pill" data-a="blk" data-u2="${p.user_id}">Block</button>`:`<button class="pill" data-a="del" data-id="${p.id}">Delete</button>`}</div></div>`).join("")||'<div class="card sm">No posts yet. Be the first.</div>');
+$("#pp2").onclick=async()=>{const t=$("#pt").value.trim();if(!t)return;const{error}=await SB.from("posts").insert({user_id:me.id,body:t});if(error)alert(error.message);else feed()};
+$("#fof").onclick=()=>{onlyF=!onlyF;feed()};
+ub.onclick=async ev=>{const b=ev.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,id=+b.dataset.id;
+if(a=="like"){ML.has(id)?await SB.from("likes").delete().match({post_id:id,user_id:me.id}):await SB.from("likes").insert({post_id:id,user_id:me.id});feed()}
+else if(a=="follow"){b.dataset.f=="1"?await SB.from("follows").delete().match({follower_id:me.id,following_id:b.dataset.u2}):await SB.from("follows").insert({follower_id:me.id,following_id:b.dataset.u2});feed()}
+else if(a=="rep")rep("post",id);else if(a=="blk"){await blk(b.dataset.u2);feed()}else if(a=="del"&&confirm("Delete this post?")){await SB.from("posts").delete().eq("id",id);feed()}}}
+async function chat(){const ub=$("#ub");ub.innerHTML=`<div class="tabs">${ROOMS.map(x=>`<button class="pill ${room==x[0]?"on":""}" data-rm="${x[0]}">${x[1]}</button>`).join("")}</div><div class="card" id="ms" style="height:50vh;overflow:auto"></div><input id="mt" maxlength="500" placeholder="Type a message…"><button class="btn" id="sd">Send</button>`;
+document.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{room=b.dataset.rm;sv("room",room);ummah()});
+const ld2=async()=>{const[bl,ms]=await Promise.all([SB.from("blocks").select("blocked_id"),SB.from("messages").select("*").eq("room",room).order("created_at",{ascending:false}).limit(60)]);const box=$("#ms");if(!box)return;if(ms.error){box.textContent=ms.error.message;return}const B=new Set((bl.data||[]).map(x=>x.blocked_id)),end=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
+box.innerHTML=ms.data.filter(m=>!B.has(m.user_id)).reverse().map(m=>`<div class="row blk" style="padding:6px 0"><div><b>${e(m.username)}</b> <span class="sm">${tmf(m.created_at)}</span></div><div style="white-space:pre-wrap">${e(m.body)}</div>${m.user_id!=me.id?`<span class="sm" data-a="rep" data-id="${m.id}" style="cursor:pointer">Report</span> · <span class="sm" data-a="blk" data-u2="${m.user_id}" style="cursor:pointer">Block</span>`:""}</div>`).join("")||'<div class="sm">No messages yet. Say Assalamu alaikum 👋</div>';if(end||!box.dataset.s){box.scrollTop=box.scrollHeight;box.dataset.s=1}};
+await ld2();
+$("#ms").onclick=async ev=>{const b=ev.target.closest("[data-a]");if(!b)return;if(b.dataset.a=="rep")rep("message",+b.dataset.id);else{await blk(b.dataset.u2);ld2()}};
+const send=async()=>{const t=$("#mt").value.trim();if(!t)return;$("#mt").value="";const{error}=await SB.from("messages").insert({room,user_id:me.id,body:t});if(error)alert(error.message);else ld2()};
+$("#sd").onclick=send;$("#mt").onkeydown=ev=>{if(ev.key=="Enter")send()};
+const ch=SB.channel("room-"+room).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"room=eq."+room},ld2).subscribe();cleanup=()=>SB.removeChannel(ch);pollT=setInterval(ld2,6000)}
+async function acct(){const ub=$("#ub"),{data}=await SB.from("profiles").select("username").eq("id",me.id).maybeSingle();ub.innerHTML=`<div class="card"><h2 style="font-size:17px">${e(data?data.username:"Account")}</h2><div class="sm">${e(me.email)}</div><br><button class="btn" id="lo">Log out</button> <button class="pill" id="ubk">Unblock everyone</button></div><div class="sm">Rules: be respectful, no hate, no spam, no inappropriate content. Use Report on any post or message.</div>`;
+$("#lo").onclick=async()=>{await SB.auth.signOut();ummah()};$("#ubk").onclick=async()=>{await SB.from("blocks").delete().eq("blocker_id",me.id);alert("Done")}}
+
+const V={home,quran,hadith,dua,tasbeeh,ummah,more},NAV=[["home","🏠","Home"],["quran","📖","Quran"],["hadith","📜","Hadith"],["dua","🤲","Dua"],["tasbeeh","📿","Tasbeeh"],["ummah","💬","Ummah"],["more","☰","More"]];
+function go(){stop();$("#nav").innerHTML=NAV.map(n=>`<button class="${n[0]==tab?"on":""}" data-n="${n[0]}"><span>${n[1]}</span>${n[2]}</button>`).join("");document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{tab=b.dataset.n;go()});$("#hj").textContent=hEN(new Date());V[tab]()}
 go();
 </script></body></html>
