@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="green"><head><meta charset="utf-8">
+<html lang="en" data-theme="pearl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Noor-e-Ilahi</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#14573f"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu&family=Fraunces:wght@600&display=swap">
@@ -8,6 +8,12 @@
 [data-theme=dark]{--bg:#0b1f1a;--card:#12332a;--ink:#eef2e6;--mut:#9fb3a8;--g:#2f9a72;--gold:#e0b95a;--line:#1f4a3d;--on:#fff}
 [data-theme=blue]{--bg:#e9f0f8;--card:#fff;--ink:#12263f;--mut:#5a6b80;--g:#1d4f8f;--gold:#c58a1b;--line:#cfdbea;--on:#fff}
 [data-theme=sand]{--bg:#efe6d2;--card:#fbf6ea;--ink:#2b2318;--mut:#7a6a4c;--g:#8a5a1f;--gold:#b8892b;--line:#dccfae;--on:#fff}
+[data-theme=pearl]{--bg:#e6e9e8;--card:#f7f8f8;--ink:#1d2a27;--mut:#66726f;--g:#14573f;--gold:#b8892b;--line:#d3d9d7;--on:#fff}
+[data-theme=pearl] .card,[data-theme=pearl] .gi{box-shadow:0 8px 18px rgba(60,75,70,.10),0 -3px 8px rgba(255,255,255,.9)}
+[data-theme=pearl] .pill{box-shadow:0 3px 8px rgba(60,75,70,.10)}[data-theme=pearl] .pill.on{box-shadow:none}
+[data-theme=pearl] nav{background:linear-gradient(#f4f6f5,#e1e5e4)}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.gi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 4px;text-align:center;color:var(--ink);font:inherit;font-size:13px}.gi span{display:block;font-size:26px;margin-bottom:4px}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;max-width:560px;margin:auto;padding:env(safe-area-inset-top,0px) 0 110px}
 h1,h2{font-family:Fraunces,Georgia,serif;margin:0}.sm{color:var(--mut);font-size:13px}
@@ -26,8 +32,8 @@ main{padding:0 14px}
 input,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--card);color:var(--ink);font:inherit;margin-bottom:8px}
 .tabs{display:flex;flex-wrap:wrap}
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
-nav button{flex:1;border:0;background:none;color:var(--mut);font-size:11px;padding:4px 0}nav button span{display:block;font-size:19px}nav button.on{color:var(--g);font-weight:700}
-#bar{display:none;position:fixed;bottom:calc(62px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:536px;background:var(--g);color:var(--on);border-radius:14px;padding:10px 14px;justify-content:space-between;align-items:center}
+nav button{flex:1;border:0;background:none;color:var(--mut);font-size:10.5px;padding:2px 0}nav button img{display:block;width:40px;height:40px;margin:0 auto 2px;border-radius:12px;box-shadow:0 3px 8px rgba(40,55,50,.22);filter:contrast(1.12);transition:.15s}nav button.on{color:var(--g);font-weight:700}nav button.on img{transform:translateY(-3px);box-shadow:0 0 0 2.5px var(--g),0 6px 12px rgba(0,0,0,.25)}
+#bar{display:none;position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:536px;background:var(--g);color:var(--on);border-radius:14px;padding:10px 14px;justify-content:space-between;align-items:center}
 #bar button{background:none;border:1px solid var(--on);color:var(--on);border-radius:10px;padding:4px 12px;margin-left:6px}
 .big-btn{width:180px;height:180px;border-radius:50%;border:6px solid var(--gold);background:var(--g);color:var(--on);font:600 52px Fraunces,serif;display:block;margin:14px auto}.big-btn:active{transform:scale(.96)}
 .dial{width:240px;height:240px;border-radius:50%;border:3px solid var(--line);margin:14px auto;position:relative}
@@ -40,13 +46,14 @@ nav button{flex:1;border:0;background:none;color:var(--mut);font-size:11px;paddi
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 </head><body>
 <div class="top"><h1>Noor-e-Ilahi نورِ الٰہی</h1><div class="sm" id="hj"></div></div>
+<div id="bk" style="padding:0 14px"></div>
 <main id="v"></main>
 <div id="bar"><span id="pn">Playing…</span><span><button id="pv">⏮</button><button id="pp">Pause</button><button id="nx">⏭</button><button id="sp">1x</button><button id="rp">↻</button><button id="st">✕</button></span></div>
 <nav id="nav"></nav>
 <script>
 const $=s=>document.querySelector(s),e=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(x){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(x){}};
-let CL=ld("cl2","both"),TH=ld("th","green"),RC=ld("rc","ar.alafasy"),tab="home",sub="qibla",qt="surah";
+let CL=ld("cl2","both"),TH=ld("th2","pearl"),RC=ld("rc","ar.alafasy"),tab="home",sub="qibla",qt="surah";
 let loc=ld("loc",{name:"Makkah",lat:21.4225,lng:39.8262});
 const CC="AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI KH CM CA CV CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG MK NO OM PK PW PS PA PG PY PE PH PL PT QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW XK".split(" ");
 let COUNTRIES;try{const dn=new Intl.DisplayNames(["en"],{type:"region"});COUNTRIES=CC.map(c=>[c,dn.of(c)||c]).sort((a,b)=>a[1].localeCompare(b[1]))}catch(x){COUNTRIES=CC.map(c=>[c,c])}
@@ -437,7 +444,7 @@ const pl=(on,at,t)=>`<button class="pill ${on?"on":""}" ${at}>${t}</button>`,H2=
 mb.innerHTML=`<div class="card">${H2("Translation language")}<div class="sm">Arabic always shows. Choose what appears under it.</div><br>${pl(CL=="both","data-l=both","English + اردو")}${pl(CL=="en","data-l=en","English")}${pl(CL=="ur","data-l=ur","اردو")}<div class="sm" style="margin-top:6px">Extra translation (optional)</div><select id="xt"><option value="">None</option>${XTS.map(x=>`<option value="${x[0]}" ${ld("xt","")==x[0]?"selected":""}>${x[1]}</option>`).join("")}</select></div>
 <div class="card">${H2("Quran reading")}<div class="sm">Show</div><br>${pl(dm=="both","data-dm=both","Arabic + translation")}${pl(dm=="ar","data-dm=ar","Arabic only")}${pl(dm=="tr","data-dm=tr","Translation only")}<br>${pl(ld("wl",false),'id="wlt"',"Keep screen on: "+(ld("wl",false)?"On":"Off"))}<div class="sm" style="margin-top:6px">Arabic text size</div><select id="arz">${[[22,"Small"],[27,"Medium"],[34,"Large"],[40,"Extra large"]].map(z=>`<option value="${z[0]}" ${ld("ar",27)==z[0]?"selected":""}>${z[1]}</option>`).join("")}</select></div>
 <div class="card">${H2("Quran audio")}<div class="sm">Reciter</div><select id="rc">${[["ar.alafasy","Mishary Alafasy"],["ar.abdurrahmaansudais","Abdur-Rahman As-Sudais"],["ar.husary","Mahmoud Khalil Al-Husary"],["ar.abdulbasitmurattal","Abdul Basit (Murattal)"]].map(r=>`<option value="${r[0]}" ${RC==r[0]?"selected":""}>${r[1]}</option>`).join("")}</select><div class="sm">After each ayah, also play translation voice</div><br>${pl(am=="ar","data-am=ar","Arabic only")}${pl(am=="en","data-am=en","+ English voice")}${pl(am=="ur","data-am=ur","+ Urdu voice")}</div>
-<div class="card">${H2("Theme")}${[["green","Green"],["dark","Dark"],["blue","Blue"],["sand","Sand"]].map(t=>pl(TH==t[0],"data-t="+t[0],t[1])).join("")}</div>
+<div class="card">${H2("Theme")}${[["pearl","Pearl"],["green","Green"],["dark","Dark"],["blue","Blue"],["sand","Sand"]].map(t=>pl(TH==t[0],"data-t="+t[0],t[1])).join("")}</div>
 <div class="card">${H2("Prayer times")}<div class="sm">Pakistan/India: Karachi + Hanafi. Change it if your mosque follows another method.</div><select id="pm">${[[1,"Karachi (Univ. of Islamic Sciences)"],[3,"Muslim World League"],[2,"ISNA (North America)"],[5,"Egyptian"],[4,"Umm al-Qura (Makkah)"],[8,"Gulf"],[13,"Turkey (Diyanet)"],[15,"Moonsighting Committee"]].map(m=>`<option value="${m[0]}" ${PM.m==m[0]?"selected":""}>${m[1]}</option>`).join("")}</select><select id="ps"><option value="1" ${PM.s==1?"selected":""}>Asr: Hanafi</option><option value="0" ${PM.s==0?"selected":""}>Asr: Shafi / Standard</option></select><div class="sm">Adjust minutes (+ or −) to match your mosque:</div>${["Fajr","Sunrise","Dhuhr","Asr","Maghrib","Isha"].map((n,i)=>`<div class="row"><span>${n}</span><input type="number" data-tn="${i}" value="${PM.t[i]}" style="width:90px;margin:0"></div>`).join("")}</div>
 <div class="card">${H2("Azan and reminders")}<div class="sm">Works while the app is open. Needs azan.mp3 in your site folder. Closed-app azan needs the Android app.</div><br>${pl(a.on,'id="azt"',"Azan: "+(a.on?"On":"Off"))}${PRN.map(n=>pl(a.p[n],"data-ap="+n,n)).join("")}<div class="sm">Reminder before azan</div><select id="apre">${[0,5,10,15,30].map(m=>`<option value="${m}" ${a.pre==m?"selected":""}>${m?m+" minutes before":"Off"}</option>`).join("")}</select><button class="pill" id="ntf">Allow notifications</button><button class="pill" id="azp">▶ Test azan screen</button></div>
 <div class="card">${H2("Install app")}<div class="sm">${DP?"Add Noor-e-Ilahi to your home screen like a normal app.":"Chrome menu ⋮ → Add to Home screen / Install app."}</div>${DP?'<br><button class="btn" id="ins">Install</button>':""}</div>`;
@@ -445,7 +452,7 @@ document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{CL=b.dataset.l;s
 document.querySelectorAll("[data-dm]").forEach(b=>b.onclick=()=>{sv("dm",b.dataset.dm);more()});document.querySelectorAll("[data-am]").forEach(b=>b.onclick=()=>{sv("am",b.dataset.am);more()});
 $("#xt").onchange=ev=>sv("xt",ev.target.value);$("#wlt").onclick=()=>{sv("wl",!ld("wl",false));more()};
 $("#arz").onchange=ev=>{sv("ar",+ev.target.value);document.documentElement.style.setProperty("--ar",ev.target.value+"px")};$("#rc").onchange=ev=>{RC=ev.target.value;sv("rc",RC)};
-document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{TH=b.dataset.t;sv("th",TH);document.documentElement.dataset.theme=TH;more()});
+document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{TH=b.dataset.t;sv("th2",TH);document.documentElement.dataset.theme=TH;more()});
 $("#pm").onchange=ev=>{PM.m=+ev.target.value;sv("pm",PM)};$("#ps").onchange=ev=>{PM.s=+ev.target.value;sv("pm",PM)};document.querySelectorAll("[data-tn]").forEach(i=>i.onchange=()=>{PM.t[+i.dataset.tn]=+i.value||0;sv("pm",PM)});
 $("#azt").onclick=()=>{a.on=!a.on;sv("az",a);if(a.on&&window.Notification&&Notification.permission=="default")Notification.requestPermission();more()};
 document.querySelectorAll("[data-ap]").forEach(b=>b.onclick=()=>{a.p[b.dataset.ap]=a.p[b.dataset.ap]?0:1;sv("az",a);more()});
@@ -465,7 +472,7 @@ const blk=async uid=>{if(!confirm("Block this user? You will not see their posts
 async function ummah(){stop();if(!SB){setV('<div class="card">Community could not load. Check your internet.</div>');return}
 const{data}=await SB.auth.getSession();me=data.session?data.session.user:null;if(!me)return authView();
 setV(`<div class="tabs">${[["feed","Posts"],["chat","Chat"],["acct","Account"]].map(t=>`<button class="pill ${ut==t[0]?"on":""}" data-u="${t[0]}">${t[1]}</button>`).join("")}</div><div id="ub"></div>`);
-document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{ut=b.dataset.u;sv("ut",ut);ummah()});
+document.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{ut=b.dataset.u;sv("ut",ut);tab=ut=="chat"?"chat":"ummah";go()});
 if(ut=="feed")feed();else if(ut=="chat")chat();else acct()}
 function authView(){setV(`<div class="card"><h2>${am=="in"?"Log in":"Create account"}</h2><br>${am=="up"?'<input id="un" placeholder="Username (3-20 letters, numbers or _)">':""}<input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="Password (6+ characters)"><button class="btn" id="go">${am=="in"?"Log in":"Sign up"}</button> <button class="pill" id="sw">${am=="in"?"New here? Sign up":"Have an account? Log in"}</button><div id="amsg" class="sm" style="margin-top:8px"></div><div class="sm">Be respectful. Every post and message has Report and Block.</div></div>`);
 $("#sw").onclick=()=>{am=am=="in"?"up":"in";authView()};
@@ -495,8 +502,17 @@ const ch=SB.channel("room-"+room).on("postgres_changes",{event:"INSERT",schema:"
 async function acct(){const ub=$("#ub"),{data}=await SB.from("profiles").select("username").eq("id",me.id).maybeSingle();ub.innerHTML=`<div class="card"><h2 style="font-size:17px">${e(data?data.username:"Account")}</h2><div class="sm">${e(me.email)}</div><br><button class="btn" id="lo">Log out</button> <button class="pill" id="ubk">Unblock everyone</button></div><div class="sm">Rules: be respectful, no hate, no spam, no inappropriate content. Use Report on any post or message.</div>`;
 $("#lo").onclick=async()=>{await SB.auth.signOut();ummah()};$("#ubk").onclick=async()=>{await SB.from("blocks").delete().eq("blocker_id",me.id);alert("Done")}}
 
-const V={home,quran,hadith,dua,tasbeeh,ummah,more},NAV=[["home","🏠","Home"],["quran","📖","Quran"],["hadith","📜","Hadith"],["dua","🤲","Dua"],["tasbeeh","📿","Tasbeeh"],["ummah","💬","Ummah"],["more","☰","More"]];
-function go(){stop();$("#nav").innerHTML=NAV.map(n=>`<button class="${n[0]==tab?"on":""}" data-n="${n[0]}"><span>${n[1]}</span>${n[2]}</button>`).join("");document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{tab=b.dataset.n;go()});$("#hj").textContent=hEN(new Date());V[tab]()}
+const GRID=[["📖","Quran","quran"],["📜","Hadith","hadith"],["🤲","Duas","dua:duas"],["🌅","Azkar","dua:azkar"],["📿","Tasbeeh","tasbeeh"],["🧭","Qibla","more:qibla"],["🎯","Goals","more:goals"],["🗓️","Calendar","more:calendar"],["🔁","Hijri converter","more:hijri"],["🕌","Masjids","more:masjid"],["✨","99 Names","more:names"],["🕋","Hajj & Umrah","more:guide"]];
+async function dash(){load();const n=new Date(),R0=await times(n),p=R0.rows;LAST=R0;let ni=p.findIndex(x=>x[0]!=="Sunrise"&&x[2]*3600>nowS(R0.tz));if(ni<0)ni=0;const nx=p[ni];
+setV(`<div class="hero" id="dh" style="cursor:pointer"><div class="sm" style="color:inherit;opacity:.85">📍 ${e(loc.name)}</div><div style="font-size:18px">${hEN(n)}</div><div class="ar" style="font-size:20px;line-height:1.6">${hAR(n)}</div><div style="margin-top:8px">Next: ${nx[0]} · ${fmt(nx[2])}</div><div class="big" id="cd">--:--:--</div><div class="sm" style="color:inherit;opacity:.85">Tap for all prayer times</div></div>
+<div class="gr">${GRID.map(g=>`<button class="gi" data-go="${g[2]}"><span>${g[0]}</span>${g[1]}</button>`).join("")}</div>`);
+const tick=()=>{const el=$("#cd");if(!el)return;let t=Math.floor(nx[2]*3600-nowS(R0.tz));if(t<0)t+=86400;el.textContent=String(Math.floor(t/3600)).padStart(2,"0")+":"+String(Math.floor(t%3600/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0")};tick();TKR=setInterval(tick,1000);
+$("#dh").onclick=()=>{tab="prayer";go()};
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const[a,c]=b.dataset.go.split(":");tab=a;if(a=="dua"&&c)dtab=c;if(a=="more"&&c)sub=c;go()})}
+const V={home:dash,prayer:home,quran,hadith,dua,tasbeeh,ummah:()=>{if(ut=="chat")ut="feed";ummah()},chat:()=>{ut="chat";ummah()},settings:()=>{sub="settings";more()},more},NAV=[["home","nav-home.png","Home"],["prayer","nav-prayer.png","Prayer"],["ummah","nav-ummah.png","Ummah"],["chat","nav-chat.png","Messages"],["settings","nav-settings.png","Settings"]];
+function go(){stop();const ids=NAV.map(n=>n[0]),cur=ids.includes(tab)?tab:"home";$("#nav").innerHTML=NAV.map(n=>`<button class="${n[0]==cur?"on":""}" data-n="${n[0]}"><img src="${n[1]}" alt="">${n[2]}</button>`).join("");document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{tab=b.dataset.n;go()});
+$("#bk").innerHTML=ids.includes(tab)?"":'<button class="pill" id="bkb">← Home</button>';if(!ids.includes(tab))$("#bkb").onclick=()=>{tab="home";go()};
+$("#hj").textContent=hEN(new Date());V[tab]();window.scrollTo(0,0)}
 go();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
